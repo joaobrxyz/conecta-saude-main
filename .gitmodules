@@ -1,0 +1,12 @@
+[submodule "frontend"]
+	path = frontend
+	url = https://github.com/joaobrxyz/conecta-saude-frontend.git
+[submodule "identity-service"]
+	path = identity-service
+	url = https://github.com/joaobrxyz/conecta-saude-identity-service.git
+[submodule "scheduling-service"]
+	path = scheduling-service
+	url = https://github.com/joaobrxyz/conecta-saude-scheduling-service.git
+[submodule "patients-service"]
+	path = patients-service
+	url = https://github.com/joaobrxyz/conecta-saude-patients-service.git
