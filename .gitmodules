@@ -10,3 +10,6 @@
 [submodule "patients-service"]
 	path = patients-service
 	url = https://github.com/joaobrxyz/conecta-saude-patients-service.git
+[submodule "records-service"]
+	path = records-service
+	url = https://github.com/joaobrxyz/conecta-saude-records-service.git
