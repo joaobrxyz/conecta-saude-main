@@ -1,0 +1,53 @@
+flowchart TD
+    %% Definição de Cores
+    classDef frontend fill:#EBF3FF,stroke:#1565C0,stroke-width:2px,color:#1565C0
+    classDef gateway fill:#1E293B,stroke:#0F172A,stroke-width:2px,color:#FFFFFF
+    classDef service fill:#DCFCE7,stroke:#16A34A,stroke-width:2px,color:#14532D
+    classDef dbSQL fill:#FFFBEB,stroke:#D97706,stroke-width:2px,color:#92400E
+    classDef dbMongo fill:#F0FDF4,stroke:#16A34A,stroke-width:2px,color:#14532D
+
+    %% Aplicações Front-end (Angular)
+    subgraph FrontEnds [Aplicações Front-end Angular]
+        direction LR
+        AppPac([Portal do Paciente]):::frontend
+        AppRec([Painel Recepção / Admin]):::frontend
+        AppMed([Portal do Médico]):::frontend
+        AppTV([Painel TV - Recepção]):::frontend
+    end
+
+    %% API Gateway
+    Gateway{{"API Gateway<br>(Spring Cloud Gateway)"}}:::gateway
+
+    %% Chamadas HTTP do Front para o Gateway
+    AppPac -- "HTTP REST" --> Gateway
+    AppRec -- "HTTP REST" --> Gateway
+    AppMed -- "HTTP REST" --> Gateway
+
+    %% Chamada WebSocket para a TV
+    AppTV == "WebSocket<br>(Tempo Real)" === Gateway
+
+    %% Microsserviços Spring Boot
+    subgraph Microsservicos [Back-end: Microsserviços Spring Boot]
+        direction LR
+        Auth["Identity Service<br>(Auth & Perfis)"]:::service
+        Atendimento["Atendimento Service<br>(Agenda, Check-in & Fila)"]:::service
+        Clinical["Clinical Service<br>(Prontuários)"]:::service
+    end
+
+    %% Roteamento do Gateway
+    Gateway --> Auth
+    Gateway == "Roteia WebSocket" === Atendimento
+    Gateway --> Clinical
+
+    %% Padrão Database per Service
+    subgraph Bancos [Database per Service]
+        direction LR
+        DB_Auth[("SQL Server<br>(db_identity)")]:::dbSQL
+        DB_Atend[("SQL Server<br>(db_atendimento)")]:::dbSQL
+        DB_Clin[("MongoDB<br>(db_clinical)")]:::dbMongo
+    end
+
+    %% Conexões com os bancos
+    Auth --> DB_Auth
+    Atendimento --> DB_Atend
+    Clinical --> DB_Clin
