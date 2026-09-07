@@ -11,5 +11,5 @@
 	path = records-service
 	url = https://github.com/joaobrxyz/conecta-saude-records-service.git
 [submodule "conecta-saude-appointment-service"]
-	path = conecta-saude-appointment-service
+	path = appointment-service
 	url = https://github.com/joaobrxyz/conecta-saude-appointment-service.git
