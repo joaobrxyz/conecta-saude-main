@@ -13,3 +13,6 @@
 [submodule "conecta-saude-appointment-service"]
 	path = appointment-service
 	url = https://github.com/joaobrxyz/conecta-saude-appointment-service.git
+[submodule "clinical-service"]
+	path = clinical-service
+	url = https://github.com/joaobrxyz/conecta-saude-clinical-service.git
