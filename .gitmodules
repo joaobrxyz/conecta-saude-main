@@ -4,9 +4,6 @@
 [submodule "identity-service"]
 	path = identity-service
 	url = https://github.com/joaobrxyz/conecta-saude-identity-service.git
-[submodule "patients-service"]
-	path = patients-service
-	url = https://github.com/joaobrxyz/conecta-saude-patients-service.git
 [submodule "records-service"]
 	path = records-service
 	url = https://github.com/joaobrxyz/conecta-saude-records-service.git
@@ -16,3 +13,6 @@
 [submodule "clinical-service"]
 	path = clinical-service
 	url = https://github.com/joaobrxyz/conecta-saude-clinical-service.git
+[submodule "api-gateway"]
+	path = api-gateway
+	url = https://github.com/joaobrxyz/conecta-saude-api-gateway.git
