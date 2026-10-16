@@ -1,0 +1,4 @@
+.integration-*.log
+.integration-*.runtime.log
+.integration-edit.cjs
+.integration-backend.cjs
