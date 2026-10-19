@@ -120,6 +120,17 @@ try {
   await request(`/records/patient/${pp.id}/prescriptions`, { token: other, status: 403 });
   assert.equal((await request(`/records/patient/${pp.id}/prescriptions`, { token: patient }))[0].medicationName, 'Medicamento de teste'); assertions++;
   assert.equal((await request(`/records/patient/${pp.id}/vitals/latest`, { token: patient })).weightKg, 70); assertions++;
+  const examForm = new FormData(); examForm.set('patientId', pp.id); examForm.set('title', 'Hemograma de integracao'); examForm.set('file', new Blob(['%PDF-1.4 integration exam'], { type: 'application/pdf' }), 'hemograma.pdf');
+  const examUpload = await fetch(base + '/exams', { method: 'POST', headers: { Authorization: `Bearer ${doctor}` }, body: examForm });
+  const examUploadText = await examUpload.text();
+  assert.equal(examUpload.status, 201, `POST /exams: ${examUpload.status} ${examUploadText}`); assertions++;
+  const exam = JSON.parse(examUploadText);
+  assert.equal((await request(`/exams/patient/${pp.id}`, { token: patient }))[0].title, 'Hemograma de integracao'); assertions++;
+  await request(`/exams/patient/${pp.id}`, { token: other, status: 403 });
+  const downloadedExam = await fetch(base + `/exams/${exam.id}/download`, { headers: { Authorization: `Bearer ${patient}` } });
+  assert.equal(downloadedExam.status, 200); assert.equal(await downloadedExam.text(), '%PDF-1.4 integration exam'); assertions += 2;
+  const deniedExam = await fetch(base + `/exams/${exam.id}/download`, { headers: { Authorization: `Bearer ${other}` } });
+  assert.equal(deniedExam.status, 403); assertions++;
   await request(`/records/${record.id}/addendum`, { token: doctor, method: 'PATCH', body: 'Adendo de integração', contentType: 'text/plain', status: 204 });
   await request(`/appointments/${appointment.id}/status`, { token: doctor, method: 'PATCH', body: { status: 'REALIZADA' } });
   assert.equal((await request('/appointments', { token: patient }))[0].status, 'REALIZADA'); assertions++;

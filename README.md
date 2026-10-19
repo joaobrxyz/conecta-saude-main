@@ -59,9 +59,9 @@ O bootstrap exige senha com pelo menos 12 caracteres e não altera um administra
 | Área | Operações |
 | --- | --- |
 | Acesso | Login por e-mail, cadastro de paciente, perfil identificado pelo JWT, sessão temporária ou persistente, renovação de token e logout |
-| Paciente | Painel, agendamento, listagem e cancelamento de consultas, histórico clínico, sinais vitais, prescrições e edição do próprio perfil |
+| Paciente | Painel, agendamento, listagem e cancelamento de consultas, histórico clínico, sinais vitais, prescrições, download dos próprios exames e edição do próprio perfil |
 | Recepção | Agenda, cadastro/edição/inativação de pacientes, agendamento, check-in, registro de falta e cancelamento |
-| Médico | Agenda, fila, início e conclusão de atendimento, prontuário, prescrições, sinais vitais e adendos privados |
+| Médico | Agenda, fila, início e conclusão de atendimento, prontuário, prescrições, sinais vitais, adendos privados e publicação de exames |
 | Administração | Indicadores calculados dos dados reais, usuários, especialidades e agenda |
 | Todas as contas | Edição do próprio nome/e-mail/telefone e troca de senha mediante senha atual |
 
@@ -73,7 +73,7 @@ As telas usam componentes compartilhados em [shared](frontend/src/app/shared), p
 
 ### Funcionalidades ainda indisponíveis
 
-Os serviços existentes não implementam exames/anexos, notificações, salas de atendimento, auditoria e configurações gerais da clínica. O portal informa a indisponibilidade e não apresenta exemplos como se fossem dados reais.
+Os serviços existentes não implementam notificações, salas de atendimento, auditoria e configurações gerais da clínica. O portal informa a indisponibilidade e não apresenta exemplos como se fossem dados reais.
 
 Renovação de receita e exportação PDF eram simulações no back end; esses endpoints agora retornam `501` e não são oferecidos como ações funcionais. O pedido e a redefinição de senha estão ligados à API, mas o envio de e-mail ainda não existe: em desenvolvimento, o serviço de identidade registra o link no console. O link aponta para `/redefinir-senha?token=...` no portal; configure `APP_FRONTEND_URL` para outro endereço. O portal informa essa limitação ao solicitar recuperação.
 
