@@ -2,3 +2,5 @@
 .integration-*.runtime.log
 .integration-edit.cjs
 .integration-backend.cjs
+.vscode/
+Microsoft/
