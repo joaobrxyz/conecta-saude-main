@@ -1,0 +1,121 @@
+version: '3.8'
+
+networks:
+  conecta-network:
+    driver: bridge
+
+services:
+  # ==========================================
+  # 1. BANCOS DE DADOS
+  # ==========================================
+  postgres-identity:
+    image: postgres:15-alpine
+    container_name: db_identity_conecta
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=db_identity
+    ports:
+      - "5434:5432" # Porta externa 5434 mapeada para a 5432 do container
+    networks:
+      - conecta-network
+
+  postgres-appointment:
+    image: postgres:15-alpine
+    container_name: db_appointment_conecta
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+      - POSTGRES_DB=db_appointment
+    ports:
+      - "5435:5432"
+    networks:
+      - conecta-network
+
+  mongo-clinical:
+    image: mongo:latest
+    container_name: db_clinical_conecta
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=rootpassword
+      - MONGO_INITDB_DATABASE=clinical_db
+    ports:
+      - "27017:27017"
+    networks:
+      - conecta-network
+
+  # ==========================================
+  # 2. MICROSSERVIÇOS (BACKEND)
+  # ==========================================
+  identity-service:
+    build: ./identity-service  # Aponta para a pasta onde está o Dockerfile do MS
+    container_name: identity-service
+    ports:
+      - "8082:8082"
+    depends_on:
+      - postgres-identity
+    environment:
+      # Sobrescreve o application.properties para usar o nome do container do banco
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-identity:5432/db_identity
+    networks:
+      - conecta-network
+
+  appointment-service:
+    build: ./appointment-service
+    container_name: appointment-service
+    ports:
+      - "8081:8081"
+    depends_on:
+      - postgres-appointment
+    environment:
+      - TZ=America/Sao_Paulo
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres-appointment:5432/db_appointment
+      - IDENTITY_SERVICE_URL=http://identity-service:8082
+    networks:
+      - conecta-network
+
+  clinical-service:
+    build: ./clinical-service
+    container_name: clinical-service
+    ports:
+      - "8083:8083"
+    depends_on:
+      - mongo-clinical
+    environment:
+      - SPRING_MONGODB_URI=mongodb://root:rootpassword@mongo-clinical:27017/clinical_db?authSource=admin&uuidRepresentation=standard
+      - SPRING_DATA_MONGODB_URI=mongodb://root:rootpassword@mongo-clinical:27017/clinical_db?authSource=admin&uuidRepresentation=standard
+      - SPRING_MONGODB_UUID_REPRESENTATION=standard
+      - IDENTITY_SERVICE_URL=http://identity-service:8082
+      - APPOINTMENT_SERVICE_URL=http://appointment-service:8081
+    networks:
+      - conecta-network
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "8080:8080"
+    depends_on:
+      - identity-service
+      - appointment-service
+      - clinical-service
+    environment:
+      # O gateway aponta para os nomes dos containers internos
+      - IDENTITY_SERVICE_URL=http://identity-service:8082
+      - APPOINTMENT_SERVICE_URL=http://appointment-service:8081
+      - CLINICAL_SERVICE_URL=http://clinical-service:8083
+    networks:
+      - conecta-network
+
+  # ==========================================
+  # 3. FRONTEND (ANGULAR)
+  # ==========================================
+  frontend:
+    build: ./frontend
+    container_name: frontend-angular
+    ports:
+      - "4200:80" # Pressupondo que o Dockerfile do Angular usa Nginx (expõe na 80)
+    depends_on:
+      - api-gateway
+    networks:
+      - conecta-network
